@@ -2,6 +2,7 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
 using PatientManagementSystem.API.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace PatientManagementSystem.API.Services
 {
@@ -22,8 +23,10 @@ namespace PatientManagementSystem.API.Services
                 using (SqlConnection connection = new SqlConnection(_connectionString))
                 {
                     connection.Open();
-                    string query = "INSERT INTO Patients (Name, Email, PhoneNumber, Age) VALUES (@Name, @Email, @PhoneNumber, @Age)";
-                    SqlCommand command = new SqlCommand(query, connection);
+                    // string query = "INSERT INTO Patients (Name, Email, PhoneNumber, Age) VALUES (@Name, @Email, @PhoneNumber, @Age)";
+                    SqlCommand command = new SqlCommand("dbo.AddPatient", connection);
+                    command.CommandType = CommandType.StoredProcedure;
+                    
                     command.Parameters.AddWithValue("@Name", patient.Name);
                     command.Parameters.AddWithValue("@Email", patient.Email);
                     command.Parameters.AddWithValue("@PhoneNumber", patient.PhoneNumber);
@@ -56,11 +59,32 @@ namespace PatientManagementSystem.API.Services
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                SqlCommand command = new SqlCommand("AddPatient", connection);
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.AddWithValue("@Id", id);
+                SqlCommand deleteCommand = new SqlCommand("dbo.DeletePatientById", connection);
+                SqlCommand checkUserCommand = new SqlCommand("dbo.DoesPatientExist", connection);
+                
+                deleteCommand.CommandType = CommandType.StoredProcedure;
+                checkUserCommand.CommandType = CommandType.StoredProcedure;
+                checkUserCommand.Parameters.AddWithValue("@Id", id);
+                SqlParameter outputParam = new SqlParameter("@Exists", SqlDbType.Bit)
+                {
+                    Direction = ParameterDirection.Output
+                };
+                checkUserCommand.Parameters.Add(outputParam);
                 connection.Open();
-                int rowsAffected = command.ExecuteNonQuery();
+                checkUserCommand.ExecuteNonQuery();
+                if (!Convert.ToBoolean(outputParam.Value))
+                {
+                    return new ResponseDto
+                    {
+                        IsSuccess = false,
+                        Message = "No patient found with the given ID.",
+                        Data = null
+                    };
+                }
+
+                deleteCommand.Parameters.AddWithValue("@Id", id);
+               
+                int rowsAffected = deleteCommand.ExecuteNonQuery();
                 connection.Close();
                 if (rowsAffected > 0)
                 {
@@ -88,7 +112,7 @@ namespace PatientManagementSystem.API.Services
             List<Patient> patients = new List<Patient>();
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                SqlCommand command = new SqlCommand("GetAllPatients", connection);
+                SqlCommand command = new SqlCommand("dbo.GetAllPatients", connection);
                 command.CommandType = CommandType.StoredProcedure;
                 connection.Open();
                 SqlDataReader reader = command.ExecuteReader();
@@ -117,7 +141,8 @@ namespace PatientManagementSystem.API.Services
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                SqlCommand command = new SqlCommand("GetPatientById", connection);
+                SqlCommand command = new SqlCommand("dbo.GetPatientById", connection);
+  
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@Id", id);
                 connection.Open();
@@ -157,7 +182,7 @@ namespace PatientManagementSystem.API.Services
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                SqlCommand command = new SqlCommand("UpdatePatient", connection);
+                SqlCommand command = new SqlCommand("dbo.UpdatePatientById", connection);
                 command.CommandType = CommandType.StoredProcedure;
                 command.Parameters.AddWithValue("@Id", id);
                 command.Parameters.AddWithValue("@Name", patient.Name);

@@ -1,0 +1,62 @@
+﻿@{
+    ViewData["Title"] = "Patients via API";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<table id="patientsTable" class="table table-bordered mt-3" style="display: none;">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+            <th>Age</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+@section Scripts {
+
+
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                url: "https://localhost:7200/api/PatientApi/get-all-patients",
+                method: "GET",
+                success: function (data) {
+                    console.log(data);
+                    if (data && data.length > 0) {
+                        $("#patientsTable tbody").empty();
+                        $.each(data, function (i, patient) {
+                            $("#patientsTable tbody").append(`
+                                                    <tr>
+                                                        <td>${patient.Id}</td>
+                                                        <td>${patient.Name}</td>
+                                                        <td>${patient.Email}</td>
+                                                        <td>${patient.PhoneNumber}</td>
+                                                        <td>${patient.Age}</td>
+                                                    </tr>
+                                                `);
+                        });
+                        $("#patientsTable").show();
+                        $("#error").text("");
+                    } else {
+                        $("#error").text("No patients found.");
+                        $("#patientsTable").hide();
+                    }
+                },
+                error: function () {
+                    $("#error").text("Error fetching data from API.");
+                    $("#patientsTable").hide();
+                }
+            });
+        });
+
+    </script>
+}

@@ -43,7 +43,7 @@ public class PatientApiController : ControllerBase
     }
 
     [HttpPut]
-    [Route("update-patient/{id}")]
+    [Route("update-patient/{id:int}")]
     public IActionResult UpdatePatient([FromRoute] int id, [FromBody] Patient patient)
     {
         if (ModelState.IsValid)
@@ -63,10 +63,25 @@ public class PatientApiController : ControllerBase
     }
 
     [HttpDelete]
-    [Route("delete-patient/{id}")]
+    [Route("delete-patient/{id:int}")]
     public IActionResult DeletePatient([FromRoute] int id)
     {
         var response = _patientService.DeletePatient(id);
+        if (response.IsSuccess)
+        {
+            return Ok(response);
+        }
+        else
+        {
+            return BadRequest(response);
+        }
+    }
+
+    [HttpGet]
+    [Route("get-patient/{id:int}")]
+    public IActionResult GetPatientById([FromRoute]int id)
+    {
+        var response = this._patientService.GetPatientById(id);
         if (response.IsSuccess)
         {
             return Ok(response);

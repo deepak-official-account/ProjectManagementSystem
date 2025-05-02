@@ -1,6 +1,7 @@
 
 
 using Microsoft.AspNetCore.Mvc;
+using PatientManagementSystem.API.Models;
 namespace PatientManagementSystem.UI.Controllers;
 public class PatientController : Controller
 {
@@ -10,26 +11,13 @@ public class PatientController : Controller
         return View();
     }
 
-    [HttpPost]
-
-    public IActionResult AddPatient()
-    {
-        return View();
-    }
 
     public IActionResult UpdatePatient()
     {
         return View();
     }
 
-    public IActionResult DeletePatient()
-    {
-        return View();
-    }
+  
 
-    public IActionResult GetAllPatients()
-    {
-        return View();
-    }
-    
+
 }
