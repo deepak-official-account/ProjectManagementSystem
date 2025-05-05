@@ -34,13 +34,14 @@
                     if (data && data.length > 0) {
                         $("#patientsTable tbody").empty();
                         $.each(data, function (i, patient) {
+                            console.log(patient);
                             $("#patientsTable tbody").append(`
                                                     <tr>
-                                                        <td>${patient.Id}</td>
-                                                        <td>${patient.Name}</td>
-                                                        <td>${patient.Email}</td>
-                                                        <td>${patient.PhoneNumber}</td>
-                                                        <td>${patient.Age}</td>
+                                                        <td>${patient.id}</td>
+                                                        <td>${patient.name}</td>
+                                                        <td>${patient.email}</td>
+                                                        <td>${patient.phoneNumber}</td>
+                                                        <td>${patient.age}</td>
                                                     </tr>
                                                 `);
                         });

@@ -34,15 +34,15 @@ namespace PatientManagementSystem.API
                 options.AddPolicy("AllowSpecificOrigin",
                     builder =>
                     {
-                        builder.WithOrigins("https://localhost:7247/") // Specify your allowed origin here
-                                                                       //    .AllowAnyHeader()
+                        builder.WithOrigins("https://localhost:7247") // Specify your allowed origin here
+                                                                      //    .AllowAnyHeader()
                                .AllowAnyMethod();
 
                         // If you need to allow multiple specific origins:
                         // builder.WithOrigins("https://www.domain1.com", "https://www.domain2.com")
 
                         // If you need to allow credentials:
-                        // builder.AllowCredentials();
+                         builder.AllowCredentials();
                     });
             });
 
